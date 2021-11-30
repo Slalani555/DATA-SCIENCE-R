@@ -1,2 +1,1 @@
-# Titanic_data_analysis
-Titanic_Repo
+This repository contains the Exploratory Data Analysis and Machine Learning Algorithm R-code implemented on datasets taken from Kaggle.
