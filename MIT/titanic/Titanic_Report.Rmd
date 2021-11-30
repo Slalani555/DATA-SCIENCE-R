@@ -1,0 +1,151 @@
+---
+title: "Titanic dataset Visualization"
+author: "Sharmin Lalani"
+date: "11/30/2021"
+output: html_document
+---
+
+### Importing libraries
+```{r loading data and libraries,message=FALSE}
+library(tidyverse)
+library(ggridges)
+train_data<-read.csv("train.csv", stringsAsFactors = FALSE)
+summary(train_data)
+```
+# Exploratory Data Analysis
+
+### Density plots of age grouped by sex
+```{r , echo=FALSE}
+train_data%>%group_by(Sex)%>%
+  ggplot(aes(Age,y=..count..,color=Sex,fill=Sex))+
+  geom_density(alpha=0.2,bw=0.8)+
+  facet_grid(Sex~.)
+```
+
+
+### Smooth Density
+
+```{r , echo=FALSE}
+train_data%>%group_by(Sex)%>%
+  ggplot(aes(Age,y=..count..,color=Sex,fill=Sex))+
+  geom_density(alpha=0.2)+
+  facet_grid(Sex~.)
+```
+
+
+### QQ Plot
+
+```{r , echo=FALSE}
+params<-train_data %>%
+  filter(!is.na(Age))%>%
+  summarize(mean=mean(Age),sd=sd(Age))
+
+train_data %>% ggplot(aes(sample=Age))+
+  geom_qq(dparams=params)+
+  geom_abline()
+```
+
+
+### Bar Chart clearly shows that less than half of the passengers survived and most of them were female.
+
+```{r , echo=FALSE}
+train_data%>% ggplot(aes(Survived,fill=Sex))+geom_bar(position=position_dodge())
+```
+
+
+
+```{r , echo=FALSE}
+tab<-train_data %>%group_by(Sex)%>%
+  count(Survived==1)%>%
+  mutate(proportion=n/sum(n))
+tab
+```
+
+
+```{r , echo=FALSE}
+tab_survived<- train_data %>%
+  count(Survived)%>%
+  mutate(proportion=n/sum(n))
+tab_survived
+```
+
+
+
+```{r , echo=FALSE}
+tab_survived%>% ggplot(aes(Survived,proportion))+geom_bar(stat="identity")
+```
+
+
+### Density Plot of age-Survival by Age
+
+```{r , echo=FALSE}
+train_data%>% ggplot(aes(Age,y=..count..,fill=Survived))+geom_density(alpha=0.2)
+```
+
+
+### Boxplot of Fare grouped by Survival Status
+#This plot reveals that Passengers who survived generally payed higher fares than those who did not survive
+#Also the median fare was lower for passengers who did not survive and most individuals who paid around $8 did not survive.
+
+```{r , echo=FALSE}
+train_data%>% filter(Fare!=0)%>% ggplot(aes(Survived,Fare,fill=Survived))+
+  geom_boxplot()+
+  scale_y_continuous(trans="log2")+
+  geom_jitter(alpha=0.5)
+```
+
+
+### Survival by Passenger Class
+
+```{r , echo=FALSE}
+train_data%>% ggplot(aes(Pclass,fill=Survived))+
+  geom_bar()
+```
+
+
+#Bar Plot showing the relative proportion in each group instead of counts
+
+```{r , echo=FALSE}
+train_data%>% ggplot(aes(Pclass,fill=Survived))+
+  geom_bar(position=position_fill())+
+  coord_flip()+
+  ggtitle("Relative proportion in each group")
+  
+```
+
+
+
+```{r , echo=FALSE}
+train_data%>% ggplot(aes(Survived,fill=Pclass))+
+  geom_bar(position=position_fill())
+```
+
+#Grid for Density Plots for age,filled by survival status
+
+
+```{r , echo=FALSE}
+train_data %>% ggplot(aes(Age,y=..count..,fill=Survived))+geom_density()+
+  facet_grid(Sex~Pclass)
+```
+
+
+
+```{r , echo=FALSE}
+train_data%>%filter(Survived==1)%>% ggplot(aes(Age,Sex))+
+  geom_density_ridges(jittered_points=TRUE,
+                      position=position_points_jitter(height=0),
+                      point_shape ='|',point= 3,
+                      point_alpha= 1,alpha=0.7)
+```
+
+
+
+```{r , echo=FALSE}
+train_data%>%filter(Survived==0)%>% ggplot(aes(Age,Sex))+
+  geom_density_ridges(jittered_points=TRUE,
+                      position=position_points_jitter(height=0),
+                      point_shape ='|',point= 3,
+                      point_alpha= 1,alpha=0.7)
+```
+
+
